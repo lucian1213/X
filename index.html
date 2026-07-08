@@ -1,0 +1,387 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>남극지점 X · GM 감염 모니터</title>
+<style>
+  :root{
+    --bg:#0a0f14; --panel:#0e151d; --panel2:#101a24;
+    --line:#1c2a36; --lineSoft:#152029;
+    --frost:#d6e9f2; --dim:#6f8595; --dimmer:#47596a;
+    --cyan:#54cfe0; --safe:#46b7a6; --warn:#d7a13f;
+    --danger:#e2574c; --crimson:#a83244;
+    --mono:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+    --sans:'Noto Sans KR','Apple SD Gothic Neo',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--bg);color:var(--frost);font-family:var(--sans);
+    padding:18px 16px 40px;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1400px;margin:0 auto}
+  h1{margin:5px 0 0;font-size:22px;font-weight:800;letter-spacing:-.5px}
+  h2{margin:0;font-size:12.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--frost)}
+  .eyebrow{display:flex;align-items:center;gap:7px;color:var(--cyan);font-family:var(--mono);
+    font-size:10.5px;letter-spacing:3px;text-transform:uppercase}
+  .head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:16px}
+  .btn{display:inline-flex;align-items:center;gap:5px;background:transparent;border:1px solid var(--line);
+    color:var(--dim);font-size:12px;font-family:var(--sans);padding:5px 10px;border-radius:7px;cursor:pointer}
+  .btn:hover{border-color:var(--dim)}
+  .cols{display:flex;flex-wrap:wrap;gap:18px;align-items:flex-start}
+  main{flex:1 1 620px;min-width:0}
+  aside{flex:0 0 306px;position:sticky;top:10px;max-height:calc(100vh - 20px);overflow:auto;
+    display:grid;gap:14px}
+  /* 캐릭터 격자 */
+  .chargrid{display:grid;grid-template-columns:58px repeat(4,minmax(0,1fr));gap:7px;margin-bottom:18px}
+  .colhead{text-align:center;font-family:var(--mono);font-size:11px;color:var(--dim);letter-spacing:1px;padding-bottom:2px}
+  .rowlab{display:flex;align-items:center;justify-content:flex-end;padding-right:4px}
+  .rowlab .in{display:flex;flex-direction:column;align-items:flex-end;gap:2px}
+  .rowlab .nm{font-size:13px;font-weight:700}
+  .rowlab .tv{font-family:var(--mono);font-size:11px;color:var(--dimmer)}
+  .rowlab .tv.over{color:var(--danger)}
+  .grid5{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px}
+  .sectlab{display:flex;align-items:center;gap:8px;margin:0 0 8px}
+  .sectlab span.t{font-family:var(--mono);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--cyan)}
+  .sectlab span.r{flex:1;height:1px;background:var(--lineSoft)}
+  /* 카드 */
+  .card{background:var(--panel);border:1px solid var(--lineSoft);border-radius:9px;
+    padding:8px 9px 7px;display:flex;flex-direction:column;gap:6px;min-height:92px}
+  .card.assigned{border-color:var(--line)}
+  .card.inf{background:#150e11;border-color:#e2574c44}
+  .card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:6px}
+  .card-name{font-size:13px;font-weight:700;line-height:1.25;color:var(--frost)}
+  .card-type{font-size:9.5px;color:var(--dimmer);margin-top:2px}
+  .badge{flex-shrink:0;font-family:var(--mono);font-size:11px;font-weight:700;color:var(--danger);
+    background:#241014;border:1px solid #e2574c55;border-radius:5px;padding:1px 6px}
+  .chips{display:flex;gap:4px;margin-top:auto}
+  .chip{flex:1;height:22px;border-radius:5px;font-size:11px;font-weight:700;font-family:var(--sans);
+    cursor:pointer;border:1px solid var(--lineSoft);background:transparent;color:var(--dim);padding:0}
+  .chip[disabled]{cursor:not-allowed;opacity:.5;color:var(--lineSoft)}
+  /* 오른쪽 패널 */
+  .phead{display:flex;align-items:center;gap:7px;margin-bottom:10px;color:var(--cyan)}
+  .phead.inline{margin-bottom:0}
+  .box{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:13px}
+  .note{font-size:10.5px;color:var(--dimmer)}
+  /* 계기판 */
+  .gauge{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:9px 11px}
+  .gauge.over{background:#1a1013;border-color:#e2574c55}
+  .g-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px}
+  .g-l{display:flex;align-items:center;gap:7px;min-width:0}
+  .dot{width:8px;height:8px;border-radius:99px;flex-shrink:0}
+  .g-nm{font-size:14px;font-weight:700}
+  .flag{font-family:var(--mono);font-size:9px;color:var(--danger);border:1px solid var(--danger);border-radius:4px;padding:0 4px}
+  .g-r{display:flex;align-items:baseline;gap:5px}
+  .g-parts{font-size:9px;color:var(--dim);font-family:var(--mono)}
+  .g-val{font-family:var(--mono);font-size:19px;font-weight:700;min-width:34px;text-align:right}
+  .bar{position:relative;height:7px;background:#0a1218;border-radius:99px;overflow:hidden}
+  .fill{position:absolute;inset:0;border-radius:99px;transition:width .35s ease,background .3s}
+  .tick{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--frost);opacity:.35}
+  .g-base{display:flex;align-items:center;gap:5px;margin-top:6px}
+  .g-base label{font-size:9.5px;color:var(--dimmer)}
+  .g-base input{width:46px;background:#0a1218;border:1px solid var(--lineSoft);border-radius:4px;
+    color:var(--dim);font-family:var(--mono);font-size:10.5px;padding:1px 5px}
+  /* 밀담 / 치료 */
+  .segrow{display:flex;gap:5px;align-items:center}
+  .seg{min-width:26px;background:transparent;border:1px solid var(--line);color:var(--dim);
+    font-family:var(--mono);font-size:12px;padding:2px 0;border-radius:5px;cursor:pointer}
+  .seg.on{background:var(--cyan);color:var(--bg);border-color:var(--cyan)}
+  .counts{font-family:var(--mono);font-size:11px;color:var(--dim)}
+  .counts b.hot{color:var(--danger)}
+  .pillrow{display:flex;gap:6px;flex-wrap:wrap}
+  .pill{display:inline-flex;align-items:center;gap:5px;border:1px solid;border-radius:99px;
+    padding:5px 11px;font-size:12px;font-family:var(--sans);background:transparent;cursor:pointer;color:var(--frost)}
+  .pill[disabled]{cursor:not-allowed;opacity:.4;background:var(--lineSoft);color:var(--dimmer)}
+  .pill .pd{width:6px;height:6px;border-radius:99px}
+  .pill .p1{color:var(--dim);font-family:var(--mono)}
+  .pill.cured{border-color:var(--safe);background:#46b7a622;color:var(--safe)}
+  .log{display:flex;flex-wrap:wrap;gap:5px}
+  .logc{display:inline-flex;align-items:center;gap:5px;border:1px solid;border-radius:6px;
+    padding:2px 4px 2px 7px;font-size:11px;background:var(--panel2)}
+  .logc .i{color:var(--dimmer);font-family:var(--mono);font-size:9px}
+  .x{display:inline-flex;align-items:center;background:transparent;border:none;color:var(--dimmer);cursor:pointer;padding:1px}
+  .foot{margin:22px auto 0;font-size:10.5px;color:var(--dimmer);line-height:1.7}
+  .saved{font-family:var(--mono);font-size:10px;color:var(--dimmer);transition:color .3s}
+  .saved.on{color:var(--safe)}
+  svg{display:block}
+</style>
+
+<div class="wrap">
+  <div class="head">
+    <div>
+      <div class="eyebrow">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="2" x2="12" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><path d="m20 16-4-4 4-4M4 8l4 4-4 4M16 4l-4 4-4-4M8 20l4-4 4 4"/></svg>
+        Antarctic Point X · 오염 모니터
+      </div>
+      <h1>카드 조사 &amp; 감염 레벨 <span style="color:var(--dim);font-weight:400">추적</span></h1>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <span id="saved" class="saved">자동 저장</span>
+      <button class="btn" id="reset">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
+        초기화
+      </button>
+    </div>
+  </div>
+
+  <div class="cols">
+    <main id="main"></main>
+    <aside id="aside"></aside>
+  </div>
+
+  <div class="foot">
+    카드 아래 <b style="color:var(--dim)">군·조·기·연·의</b> 칩을 눌러 조사자 지정 (둘 누르면 페어).
+    감염 카드(붉은 <b style="color:var(--danger)">+N</b>)만 수치에 반영됩니다. GM 전용 — 수치는 플레이어에게 말하지 마세요.
+  </div>
+</div>
+
+<script>
+const THRESHOLD = 10, GAUGE_MAX = 12;
+
+const ROLES = [
+  { id:"soldier",   name:"군인",   ini:"군", base:8,   color:"#c25a44" },
+  { id:"pilot",     name:"조종사", ini:"조", base:2,   color:"#5b8fb0" },
+  { id:"mechanic",  name:"기술자", ini:"기", base:2,   color:"#c79a4a" },
+  { id:"scientist", name:"연구자", ini:"연", base:3,   color:"#6aa17e" },
+  { id:"doctor",    name:"의사",   ini:"의", base:100, color:"#a83244", culprit:true },
+];
+const roleById = Object.fromEntries(ROLES.map(r => [r.id, r]));
+
+const CHAR = {
+  soldier:[["No.1","군인의 상태","정보",0],["No.2","화염방사기","아이템",0],["No.3","버려진 군복","정보",1],["No.4","팔의 물린 상처","정보",0]],
+  pilot:[["No.1","교수와의 관계","정보",0],["No.2","차가워진 몸","정보",0],["No.3","은색 라이터","아이템",1],["No.4","오두막의 사진","아이템",0]],
+  mechanic:[["No.1","조종 면허","정보",0],["No.2","피에 젖은 수기","아이템",1],["No.3","열쇠","아이템",0],["No.4","격납고로 향한 발자국","정보",0]],
+  scientist:[["No.1","연구 기록","정보",0],["No.2","조직의 일부","아이템",2],["No.3","당일의 행동","정보",0],["No.4","유리병","아이템",0]],
+  doctor:[["No.1","연구 기록","정보",0],["No.2","신체검사 키트","정보",0],["No.3","약품 Y","아이템",2],["No.4","흰 가운","정보",0]],
+};
+const PLACE = [["격납고",0],["샤워실",0],["연구실",0],["통신실",0],["오두막",0]];
+const SECRET = [["숨겨진 소사체","격납고",3],["배수구","샤워실",2],["감염 치료","연구실",2],["남겨진 기록","통신실",1],["머리만 남은 괴물","오두막",5]];
+
+function buildCards(){
+  const out = [];
+  ROLES.forEach(r => CHAR[r.id].forEach(([slot,name,type,val]) =>
+    out.push({ id:`${r.id}_${slot}`, group:"char", owner:r.id, slot, name, type, val, invs:[] })));
+  PLACE.forEach(([name,val],i) => out.push({ id:`place_${i}`, group:"place", owner:null, type:"장소", name, val, invs:[] }));
+  SECRET.forEach(([name,sub,val],i) => out.push({ id:`secret_${i}`, group:"secret", owner:null, type:"시크릿", name, sub, val, invs:[] }));
+  return out;
+}
+
+const STORE_KEY = "antarctic_gm_console_v2";
+const uid = () => Math.random().toString(36).slice(2,8);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+let state = { cards:buildCards(), baseOv:{}, meetings:[], phase:1, cure:null };
+let ready = false;
+
+// ── 저장/불러오기 ──
+async function load(){
+  try{
+    const r = await window.storage.get(STORE_KEY);
+    if(r && r.value){
+      const s = JSON.parse(r.value);
+      if(s.cards){
+        const inv = Object.fromEntries(s.cards.map(c => [c.id, c.invs || []]));
+        state.cards = buildCards().map(c => ({ ...c, invs: inv[c.id] || [] }));
+      }
+      if(s.baseOv) state.baseOv = s.baseOv;
+      if(s.meetings) state.meetings = s.meetings;
+      if(typeof s.phase === "number") state.phase = s.phase;
+      if("cure" in s) state.cure = s.cure;
+    }
+  }catch(e){}
+  ready = true;
+  render();
+}
+let saveTimer;
+async function save(){
+  if(!ready) return;
+  try{
+    await window.storage.set(STORE_KEY, JSON.stringify(state));
+    const el = document.getElementById("saved");
+    el.textContent = "저장됨"; el.classList.add("on");
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(() => { el.textContent = "자동 저장"; el.classList.remove("on"); }, 1100);
+  }catch(e){}
+}
+
+// ── 계산 ──
+const baseOf = r => (r.id in state.baseOv) ? state.baseOv[r.id] : r.base;
+function totals(){
+  return ROLES.map(r => {
+    const base = baseOf(r);
+    const cardSum = state.cards.reduce((a,c) => a + (c.invs.includes(r.id) ? c.val : 0), 0);
+    const meetSum = state.meetings.filter(m => m.target === r.id).length;
+    const cureAmt = state.cure === r.id ? -8 : 0;
+    return { ...r, base, cardSum, meetSum, cureAmt, total: base + cardSum + meetSum + cureAmt };
+  });
+}
+function meetingsThisPhase(){ return state.meetings.filter(m => m.phase === state.phase).length; }
+function lastTarget(){ return state.meetings.length ? state.meetings[state.meetings.length-1].target : null; }
+function canMeet(tid){
+  if(state.meetings.length >= 10) return { ok:false, why:"전체 10회 상한" };
+  if(meetingsThisPhase() >= 5) return { ok:false, why:"이번 조사 5회 상한" };
+  if(tid === lastTarget()) return { ok:false, why:"직전과 동일 (연속 금지)" };
+  return { ok:true };
+}
+
+// ── 렌더 ──
+function cardHTML(c){
+  const inf = c.val > 0;
+  const cls = "card" + (inf ? " inf" : (c.invs.length ? " assigned" : ""));
+  const badge = inf ? `<span class="badge">+${c.val}</span>` : "";
+  const type = esc(c.type) + (c.sub ? ` · ${esc(c.sub)}` : "");
+  const chips = ROLES.map(r => {
+    const on = c.invs.includes(r.id), own = c.owner === r.id;
+    const st = on ? `background:${r.color};border-color:${r.color};color:#0a0f14` : "";
+    return `<button class="chip" data-card="${c.id}" data-role="${r.id}" ${own?"disabled":""} title="${own?"자신의 카드":esc(r.name)}" style="${st}">${r.ini}</button>`;
+  }).join("");
+  return `<div class="${cls}">
+    <div class="card-top"><div style="min-width:0">
+      <div class="card-name">${esc(c.name)}</div><div class="card-type">${type}</div>
+    </div>${badge}</div>
+    <div class="chips">${chips}</div>
+  </div>`;
+}
+
+function renderMain(){
+  const T = Object.fromEntries(totals().map(t => [t.id, t]));
+  let grid = `<div></div>` + ["No.1","No.2","No.3","No.4"].map(h => `<div class="colhead">${h}</div>`).join("");
+  ROLES.forEach(r => {
+    const t = T[r.id], over = t.total >= THRESHOLD && !r.culprit;
+    grid += `<div class="rowlab"><div class="in">
+      <span class="nm" style="color:${r.color}">${r.name}</span>
+      <span class="tv${over?" over":""}">${t.total}</span></div></div>`;
+    state.cards.filter(c => c.owner === r.id).forEach(c => grid += cardHTML(c));
+  });
+  const place = state.cards.filter(c => c.group === "place").map(cardHTML).join("");
+  const secret = state.cards.filter(c => c.group === "secret").map(cardHTML).join("");
+  document.getElementById("main").innerHTML =
+    `<div class="chargrid">${grid}</div>
+     <div class="sectlab"><span class="t">장소 카드</span><span class="r"></span></div>
+     <div class="grid5" style="margin-bottom:16px">${place}</div>
+     <div class="sectlab"><span class="t">시크릿 카드</span><span class="r"></span></div>
+     <div class="grid5">${secret}</div>`;
+}
+
+function gaugeHTML(p){
+  const culprit = p.culprit;
+  const pct = culprit ? 100 : Math.min(100, (p.total / GAUGE_MAX) * 100);
+  const over = !culprit && p.total >= THRESHOLD;
+  const near = !culprit && p.total >= THRESHOLD-2 && p.total < THRESHOLD;
+  const fill = culprit ? "var(--crimson)" : over ? "var(--danger)" : near ? "var(--warn)" : "var(--safe)";
+  const parts = [];
+  if(p.cardSum) parts.push(`카드+${p.cardSum}`);
+  if(p.meetSum) parts.push(`밀담+${p.meetSum}`);
+  if(p.cureAmt) parts.push(`치료${p.cureAmt}`);
+  return `<div class="gauge${over?" over":""}">
+    <div class="g-top">
+      <div class="g-l"><span class="dot" style="background:${p.color}"></span>
+        <span class="g-nm">${p.name}</span>${over?`<span class="flag">발병</span>`:""}</div>
+      <div class="g-r">${parts.length?`<span class="g-parts">${parts.join(" ")}</span>`:""}
+        <span class="g-val" style="color:${fill}">${p.total}</span></div>
+    </div>
+    <div class="bar"><div class="fill" style="width:${pct}%;background:linear-gradient(90deg, ${fill}66, ${fill})"></div>
+      ${culprit?"":`<div class="tick" style="left:${(THRESHOLD/GAUGE_MAX)*100}%"></div>`}</div>
+    <div class="g-base"><label>초기</label>
+      <input type="number" data-base="${p.id}" value="${p.base}"></div>
+  </div>`;
+}
+
+function renderAside(){
+  const T = totals();
+  const mp = meetingsThisPhase(), tot = state.meetings.length, lt = lastTarget();
+  const gauges = T.map(gaugeHTML).join("");
+
+  const segs = [1,2,3].map(n => `<button class="seg${state.phase===n?" on":""}" data-phase="${n}">${n}</button>`).join("");
+  const targetBtns = ROLES.filter(r => !r.culprit).map(r => {
+    const m = canMeet(r.id);
+    return `<button class="pill" data-meet="${r.id}" ${m.ok?"":"disabled"} title="${m.ok?"":m.why}" style="border-color:${r.color}66">
+      <span class="pd" style="background:${r.color}"></span>${r.name} <span class="p1">+1</span></button>`;
+  }).join("");
+  const logHTML = state.meetings.map((m,i) => {
+    const r = roleById[m.target];
+    return `<span class="logc" style="border-color:${r.color}55"><span class="i">${i+1}·${m.phase}</span>
+      <span style="color:${r.color}">${r.name}</span>
+      <button class="x" data-unmeet="${m.id}"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button></span>`;
+  }).join("");
+
+  const cureBtns = ROLES.filter(r => !r.culprit).map(r => {
+    const on = state.cure === r.id;
+    return `<button class="pill${on?" cured":""}" data-cure="${r.id}" style="${on?"":`border-color:${r.color}66`}">${on?"✓ ":""}${r.name}</button>`;
+  }).join("");
+
+  const syringe = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 2 4 4M17 7 3 21M9 11l4 4M14 4l6 6"/></svg>`;
+
+  document.getElementById("aside").innerHTML = `
+    <div>
+      <div class="phead"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4M12 17h.01"/></svg>
+        <h2>수치 현황</h2></div>
+      <div style="display:grid;gap:8px">${gauges}</div>
+    </div>
+
+    <div class="box">
+      <div class="phead inline">${syringe}<h2>의사 밀담</h2></div>
+      <div class="note" style="margin:2px 0 11px">단둘이 밀담 → 대상 +1 · 조사당 5 · 전체 10 · 연속 금지</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div class="segrow"><span style="font-size:11px;color:var(--dim)">조사</span>${segs}</div>
+        <div class="counts"><b class="${mp>=5?"hot":""}">${mp}/5</b>
+          <span style="color:var(--lineSoft);margin:0 6px">·</span>
+          <b class="${tot>=10?"hot":""}">${tot}/10</b></div>
+      </div>
+      <div class="pillrow" style="${state.meetings.length?"margin-bottom:10px":""}">${targetBtns}</div>
+      ${state.meetings.length?`<div class="log">${logHTML}</div>`:""}
+    </div>
+
+    <div class="box">
+      <div class="phead inline">${syringe}<h2>감염 치료 (−8)</h2></div>
+      <div class="note" style="margin:2px 0 10px">게임 중 1회 · 레벨 17까지인 대원만 구제</div>
+      <div class="pillrow">${cureBtns}</div>
+    </div>`;
+}
+
+function render(){ renderMain(); renderAside(); }
+
+// ── 이벤트 (위임) ──
+document.addEventListener("click", (e) => {
+  const t = e.target.closest("[data-card],[data-meet],[data-unmeet],[data-cure],[data-phase],#reset");
+  if(!t) return;
+
+  if(t.id === "reset"){
+    if(!confirm("조사·밀담 기록을 모두 초기화할까요?")) return;
+    state = { cards:buildCards(), baseOv:{}, meetings:[], phase:1, cure:null };
+    render(); save(); return;
+  }
+  if(t.dataset.card){
+    const cid = t.dataset.card, rid = t.dataset.role;
+    const c = state.cards.find(x => x.id === cid);
+    if(c.owner === rid) return;
+    const has = c.invs.includes(rid);
+    c.invs = has ? c.invs.filter(x => x !== rid) : [...c.invs, rid];
+    if(c.invs.length > 2) c.invs = c.invs.slice(-2);
+    render(); save(); return;
+  }
+  if(t.dataset.meet){
+    if(!canMeet(t.dataset.meet).ok) return;
+    state.meetings.push({ id:uid(), phase:state.phase, target:t.dataset.meet });
+    render(); save(); return;
+  }
+  if(t.dataset.unmeet){
+    state.meetings = state.meetings.filter(m => m.id !== t.dataset.unmeet);
+    render(); save(); return;
+  }
+  if(t.dataset.phase){ state.phase = +t.dataset.phase; render(); save(); return; }
+  if(t.dataset.cure){
+    state.cure = state.cure === t.dataset.cure ? null : t.dataset.cure;
+    render(); save(); return;
+  }
+});
+
+document.addEventListener("change", (e) => {
+  const inp = e.target.closest("[data-base]");
+  if(!inp) return;
+  state.baseOv[inp.dataset.base] = Number(inp.value) || 0;
+  render(); save();
+});
+
+// storage 없는 환경 대비
+if(typeof window.storage === "undefined"){
+  window.storage = { get:async()=>null, set:async()=>null, delete:async()=>null, list:async()=>({keys:[]}) };
+}
+load();
+</script>
