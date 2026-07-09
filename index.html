@@ -1,6 +1,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>남극지점 X · GM 콘솔</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@700;800&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg:#0a0f14; --panel:#0e151d; --panel2:#101a24;
@@ -152,6 +155,51 @@
     justify-content:center;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.4)}
   .fsbtn:hover{border-color:var(--cyan);color:var(--frost)}
   @media(max-width:720px){ .hero .brand{font-size:32px} .sline{grid-template-columns:60px 1fr} }
+
+  /* 카드 앞면 이미지 타일 */
+  .card{padding:0;overflow:hidden;gap:0;min-height:0}
+  
+  .cimg img{width:100%;height:100%;object-fit:cover;display:block}
+  .card .badge{position:absolute;top:6px;right:6px}
+  .cmeta{padding:6px 8px 0}
+  .cname{font-size:12px;font-weight:700;color:var(--frost);line-height:1.25;display:block}
+  .ctype{font-size:9px;color:var(--dimmer);display:block;margin-top:1px}
+  .card .chips{padding:6px 8px 8px}
+  .card.inf{border-color:#e2574c55}
+  .card.inf .cimg{box-shadow:inset 0 0 0 1px #e2574c33}
+
+
+  /* CSS 카드 앞면 */
+  .cface{position:relative;width:100%;height:84px;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:2px;overflow:hidden}
+  .fc{position:absolute;width:16px;height:16px;border:0 solid var(--fr, #ffffff77);
+    background:none;padding:0;border-radius:0}
+  .fc.ktl{top:7px;left:7px;border-top-width:2px;border-left-width:2px}
+  .fc.ktr{top:7px;right:7px;border-top-width:2px;border-right-width:2px}
+  .fc.kbl{bottom:7px;left:7px;border-bottom-width:2px;border-left-width:2px}
+  .fc.kbr{bottom:7px;right:7px;border-bottom-width:2px;border-right-width:2px}
+  .fno{position:absolute;top:5px;left:11px;font-family:Georgia,'Times New Roman',serif;
+    font-size:10px;color:#ffffff66;font-weight:700}
+  .flab{font-family:var(--mono);font-size:7.5px;letter-spacing:2.5px;text-transform:uppercase;opacity:.85}
+  .fname{font-family:'Nanum Myeongjo','Noto Serif KR','Apple Myungjo',Batang,serif;
+    font-size:21px;font-weight:800;color:#f4f8fa;line-height:1.05;letter-spacing:2px;
+    text-shadow:0 1px 6px rgba(0,0,0,.5)}
+  .fsub{font-size:9px;color:#ffffff9e;letter-spacing:.5px;max-width:92%;white-space:nowrap;
+    overflow:hidden;text-overflow:ellipsis}
+  /* 컴팩트 카드 (한 화면 맞춤) */
+  .card{padding:0;overflow:hidden;gap:0;min-height:0;border-radius:3px}
+  .cimg{position:relative;width:100%;aspect-ratio:4/3;background:#0a0f14}
+  
+  .card .badge{position:absolute;top:5px;right:5px;font-size:10px;padding:0 5px;z-index:2}
+
+  .card .chips{padding:5px 6px 6px;gap:4px;margin:0}
+  .card .chip{height:22px;font-size:11px;border-radius:4px}
+  .chargrid{gap:5px;margin-bottom:12px}
+  .grid5{gap:6px}
+  .sectlab{margin-bottom:7px}
+  .rowlab .nm{font-size:12px}
+  .card.inf{border-color:#e2574c55}
+  .card.inf .cface{box-shadow:inset 0 0 0 1px #e2574c40}
 </style>
 
 <div class="wrap" id="app"></div>
@@ -178,6 +226,7 @@ const CHAR = {
 };
 const PLACE = [["격납고",0],["샤워실",0],["연구실",0],["통신실",0],["오두막",0]];
 const SECRET = [["숨겨진 소사체","격납고",3],["배수구","샤워실",2],["감염 치료","연구실",2],["남겨진 기록","통신실",1],["머리만 남은 괴물","오두막",5]];
+
 
 function buildCards(){
   const out = [];
@@ -392,12 +441,13 @@ function guideHTML(){
     <div class="box"><h3>조사</h3>
       <p>1차 조사에 토큰 2개, 2차 조사에 토큰 3개를 지급받습니다. 지급받은 토큰으로 카드를 획득하고, 사용한 토큰은 획득한 카드의 위치에 놓아 주세요.</p>
       <p>조사는 임의의 순서를 정해(가위바위보 등) 시계 방향으로 진행합니다.</p>
+      <p>자신의 이름이 써있는 카드는 조사할 수 없습니다.</p>
       <p>획득한 카드는 밀담 중에 공개·교환·양도가 가능하며, 전체 공개는 전체 회의 중에만 가능합니다.</p></div>
 
     <div class="box"><h3>카드</h3>
       <p>카드는 각자의 소지품과 장소 카드 5장으로 이루어져 있습니다. 장소 카드 아래에 있는 카드는 각 장소에 해당하는 시크릿 카드로, 토큰을 이용한 조사로는 획득할 수 없습니다. 시크릿 카드는 해당 장소 카드에 적힌 조건을 충족하면 토큰 소모 없이 획득합니다.</p>
       <p>감염 수치가 올라가는 카드도 있습니다. 카드 하단에 기록된 수치만큼 자신의 초기 감염 레벨에 더해집니다. 최초 획득 시에만 계산되며, 교환·양도로는 수치가 올라가지 않습니다.</p>
-      <p>사용할 수 있는 아이템 카드도 있습니다. 사용하려면 GM에게 요청하세요. 게임을 잠시 멈추고 아이템 처리를 마친 뒤 다시 진행합니다.</p></div>
+      <p>사용할 수 있는 아이템 카드도 있습니다. 사용하려면 GM에게 요청하세요. 시간을 잠시 멈추고 아이템 처리를 마친 뒤 다시 진행합니다.</p></div>
 
     <div class="box"><h3>감염 수치에 대해</h3>
       <p>감염 수치는 정확한 값을 말해서는 안 됩니다. 설정서에 적힌 것처럼 — 괜찮다고 생각되면 <b>“괜찮다”</b>, 위험하다고 생각되면 <b>“조금 나쁘다”</b>, 너무 높아졌다고 생각되면 <b>“매우 나쁘다”</b> 정도로 표현해 주세요.</p>
@@ -471,18 +521,36 @@ function endingHTML(){
 }
 
 // ── 현황판 ──
+const FACE = {
+  soldier:  { in:"#5c1712", out:"#2a0a07", tint:"#e8b0a5", label:"CHARACTER CARD" },
+  pilot:    { in:"#17452b", out:"#08200f", tint:"#a9d8b4", label:"CHARACTER CARD" },
+  mechanic: { in:"#4c3f14", out:"#241d08", tint:"#e3d49a", label:"CHARACTER CARD" },
+  scientist:{ in:"#4a1840", out:"#240a1f", tint:"#e2aed6", label:"CHARACTER CARD" },
+  doctor:   { in:"#153455", out:"#081726", tint:"#a9c8e6", label:"CHARACTER CARD" },
+  place:    { in:"#1d2026", out:"#101214", tint:"#9aa6b0", label:"PLACE · 장소 카드" },
+  secret:   { in:"#171a20", out:"#0b0d10", tint:"#8a97a4", label:"SECRET" },
+};
 function cardHTML(c){
   const inf = c.val > 0;
   const cls = "card" + (inf ? " inf" : (c.invs.length ? " assigned" : ""));
   const badge = inf ? `<span class="badge">+${c.val}</span>` : "";
-  const type = esc(c.type) + (c.sub ? ` · ${esc(c.sub)}` : "");
+  const f = c.group === "char" ? FACE[c.owner] : FACE[c.group];
+  const big = c.group === "char" ? roleById[c.owner].name : c.name;
+  const sub = c.group === "char" ? esc(c.name) : (c.group === "secret" && c.sub ? esc(c.name) : "");
+  const no  = c.group === "char" ? `<span class="fno">${c.slot}</span>` : "";
   const chips = ROLES.map(r => {
     const on = c.invs.includes(r.id), own = c.owner === r.id;
     const st = on ? `background:${r.color};border-color:${r.color};color:#0a0f14` : "";
     return `<button class="chip" data-card="${c.id}" data-role="${r.id}" ${own?"disabled":""} title="${own?"자신의 카드":esc(r.name)}" style="${st}">${r.ini}</button>`;
   }).join("");
-  return `<div class="${cls}"><div class="card-top"><div style="min-width:0">
-      <div class="card-name">${esc(c.name)}</div><div class="card-type">${type}</div></div>${badge}</div>
+  return `<div class="${cls}">
+    <div class="cface" style="background:radial-gradient(ellipse at 50% 42%, ${f.in}, ${f.out});--fr:${f.tint}88" title="${esc(c.name)}">
+      <i class="fc ktl"></i><i class="fc ktr"></i><i class="fc kbl"></i><i class="fc kbr"></i>
+      ${no}${badge}
+      <span class="flab" style="color:${f.tint}">${f.label}</span>
+      <span class="fname">${esc(big)}</span>
+      ${sub ? `<span class="fsub">${sub}</span>` : ""}
+    </div>
     <div class="chips">${chips}</div></div>`;
 }
 function renderMain(){
