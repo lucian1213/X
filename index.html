@@ -331,6 +331,7 @@ const IC = {
   syr:`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 2 4 4M17 7 3 21M9 11l4 4M14 4l6 6"/></svg>`,
   book:`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>`,
   guide:`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>`,
+  rules:`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>`,
   ending:`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22V4a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H4"/><path d="M4 15h16"/></svg>`,
   monitor:`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>`,
   x:`<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>`,
@@ -340,7 +341,8 @@ const IC = {
 function homeHTML(){
   const cards = [
     { nav:"prologue", color:"#8aa0b5", ic:IC.book,   t:"프롤로그",   d:"게임 시작 전 공통 낭독 — 조사대 집결부터 탄 시체 발견까지" },
-    { nav:"guide",    color:"var(--cyan)", ic:IC.guide, t:"GM 가이드", d:"준비 · 공포 연출 · 진행 흐름 · 규칙 · 조사 · 신체검사 키트 결과" },
+    { nav:"guide",    color:"var(--cyan)", ic:IC.guide, t:"GM 가이드", d:"준비 · 공포 연출 · 진행 흐름 · 신체검사 키트 결과" },
+    { nav:"rules",    color:"var(--warn)", ic:IC.rules, t:"규칙 설명", d:"플레이어에게 읽어주는 규칙 — 게임의 흐름 · 조사 · 카드 · 감염 수치 · 투표" },
     { nav:"console",  color:"var(--safe)", ic:IC.monitor, t:"현황판", d:"카드 조사 체크 · 밀담·치료 반영 · 감염 레벨 실시간 추적", live:true },
     { nav:"ending",   color:"var(--crimson)", ic:IC.ending, t:"엔딩", d:"투표·격리 · 본부 · 완전 치료제 · 엔딩 분기 · 전말 해설" },
   ];
@@ -415,6 +417,46 @@ function prologueHTML(){
   </div>`;
 }
 
+// ── 규칙 설명 ──
+function rulesHTML(){
+  const flowMain = [["1차 조사·밀담","1+15분"],["전체 토론","5분"],["2차 조사·밀담","1+15분"],["전체 토론","10분"],["투표·엔딩 처리 진행",""]];
+  const frow = ([a,b]) => `<div class="frow"><span>${a}</span><span class="tm">${b}</span></div>`;
+  return `<div class="doc">
+    <div class="box"><h3>게임의 흐름</h3>
+      <div class="flow">${flowMain.map(frow).join("")}</div></div>
+
+    <div class="box"><h3>규칙</h3>
+      <ul>
+        <li>모르는 것은 게임 마스터에게 물어보기.</li>
+        <li>설정서를 타인에게 보여주지 않기.</li>
+        <li>모두가 거짓말을 할 수 있음.</li>
+        <li>한 사람만 지나치게 몰아세우지 않기.</li>
+        <li>오랜 시간 같은 가능성에 대해서만 논의했다면 다른 가능성도 제안해 보기.</li>
+        <li>승부에 너무 집착하지 말고 함께 엮어낸 이야기를 즐기기.</li>
+      </ul></div>
+
+    <div class="box"><h3>조사</h3>
+      <p>1차 조사에 토큰 2개, 2차 조사에 토큰 3개를 지급받습니다. 지급받은 토큰으로 카드를 획득하고, 사용한 토큰은 획득한 카드의 위치에 놓아 주세요.</p>
+      <p>조사는 임의의 순서를 정해(가위바위보 등) 시계 방향으로 진행합니다.</p>
+      <p>자신의 이름이 써있는 카드는 조사할 수 없습니다.</p>
+      <p>같은 사람을 중복하여 조사하거나, 장소를 중복하여 조사하여도 상관없습니다.</p>
+      <p>획득한 카드는 밀담 중에 공개·교환·양도가 가능하며, 전체 공개는 전체 회의 중에만 가능합니다.</p></div>
+
+    <div class="box"><h3>카드</h3>
+      <p>카드는 각자의 소지품과 장소 카드 5장으로 이루어져 있습니다. 장소 카드 아래에 있는 카드는 각 장소에 해당하는 시크릿 카드로, 토큰을 이용한 조사로는 획득할 수 없습니다. 시크릿 카드는 해당 장소 카드에 적힌 조건을 충족하면 토큰 소모 없이 획득합니다.</p>
+      <p>감염 수치가 올라가는 카드도 있습니다. 카드 하단에 기록된 수치만큼 자신의 초기 감염 레벨에 더해집니다. 최초 획득 시에만 계산되며, 교환·양도로는 수치가 올라가지 않습니다.</p>
+      <p>사용할 수 있는 아이템 카드도 있습니다. 아이템 카드는 <b>전체 토론 시간에만</b>, 그리고 <b>두 번째 전체 토론 5분 전까지만</b> 사용할 수 있습니다. 아이템 사용을 선언하는 즉시 시간이 멈춥니다. GM에게 공개적으로 어떤 아이템을 사용할 것인지, 카드의 전체 공개와 함께 내용을 읽어주세요. 아이템 처리를 마친 뒤 다시 진행합니다.</p></div>
+
+    <div class="box"><h3>감염 수치에 대해</h3>
+      <p>감염 수치는 정확한 값을 말해서는 안 됩니다. 설정서에 적힌 것처럼 — 괜찮다고 생각되면 <b>“괜찮다”</b>, 위험하다고 생각되면 <b>“조금 나쁘다”</b>, 너무 높아졌다고 생각되면 <b>“매우 나쁘다”</b> 정도로 표현해 주세요.</p>
+      <p>카드에 기록된 수치도 “몇이 올랐다”는 식으로 입 밖에 내지 말아 주세요. 단, 카드의 정보를 보여주면서 수치가 몇인지 확인하게 하는 것은 괜찮습니다.</p></div>
+
+    <div class="box"><h3>투표에 대해</h3>
+      <p>투표 대상은 감염 수치가 가장 높을 것으로 추정되는 사람입니다. 가장 많은 표를 받은 사람은 별도의 컨테이너에 격리됩니다. <b>최다 득표자가 여러 명이면 모두 함께 격리</b>되므로, 이 점도 토론에서 유의 깊게 이야기해 주시기 바랍니다.</p>
+      <p><b>격리되는 사람은 자신이 소유한 카드를 모두 잃습니다.</b> 남은 사람들이 합의하여 나눠 가집니다.</p></div>
+  </div>`;
+}
+
 // ── GM 가이드 ──
 function guideHTML(){
   const flowPre = [["영상 재생",""],["인물 선택 및 명찰·설정서 지급",""],["프롤로그 함께 읽기",""],["설정서 숙지","5분"],["전체 토론","10분"]];
@@ -458,36 +500,53 @@ function guideHTML(){
 
       </div>
 
-    <div class="box"><h3>게임의 흐름</h3>
-      <div class="flow">${flowMain.map(frow).join("")}</div></div>
+    <div class="box"><h3>교수의 당일 타임라인</h3>
+      <div class="gmnote">GM 전용 — 교수 본인의 동선과 실제로 남긴 대사만 시간순으로 정리. ‘교수의 귀환’에서 되살아난 교수(물체 X)를 연기할 때 말투와 마지막 말들을 그대로 참조하세요. 되살아난 교수가 이 대사를 언급하면 ‘죽은 자만 아는 것’이 되어 소름을 유발합니다. 플레이어에게는 공개 금지.</div>
 
-    <div class="box"><h3>규칙</h3>
-      <ul>
-        <li>모르는 것은 게임 마스터에게 물어보기.</li>
-        <li>설정서를 타인에게 보여주지 않기.</li>
-        <li>모두가 거짓말을 할 수 있음.</li>
-        <li>한 사람만 지나치게 몰아세우지 않기.</li>
-        <li>오랜 시간 같은 가능성에 대해서만 논의했다면 다른 가능성도 제안해 보기.</li>
-        <li>승부에 너무 집착하지 말고 함께 엮어낸 이야기를 즐기기.</li>
-      </ul></div>
+      <details class="read"><summary><b class="tag tcyan">게임 이전</b> 교수의 언행</summary><div class="rt">
+        <p style="font-weight:700;color:var(--cyan);font-size:13px;margin-bottom:6px">연구자에게 (반년 전)</p>
+        <p>연구자가 기술자와의 교제를 알렸을 때, 교수의 답은 한마디였다. <b>“아직은 안 된다.”</b> 그 이유는 끝내 말하지 않았다. 연구자가 무슨 뜻이냐고 물어도 답하지 않음. 이후 두 사람은 교수의 눈을 피해 만나게 된다.</p>
+        <p style="font-weight:700;color:var(--cyan);font-size:13px;margin:14px 0 6px">조종사에게 (20년에 걸쳐)</p>
+        <p>젊은 시절 아무도 일을 주지 않던 조종사에게 처음 조종간을 맡기며 — <b>“기계는 거짓말을 하지 않네. 그걸 다루는 인간도 그래야지.”</b> 이후 교수의 탐사에는 늘 조종사가 함께. 담배도 안 피우면서 은색 라이터를 늘 품에 지녔다(원래 20년 전 내기로 조종사에게서 딴 것).</p>
+      </div></details>
 
-    <div class="box"><h3>조사</h3>
-      <p>1차 조사에 토큰 2개, 2차 조사에 토큰 3개를 지급받습니다. 지급받은 토큰으로 카드를 획득하고, 사용한 토큰은 획득한 카드의 위치에 놓아 주세요.</p>
-      <p>조사는 임의의 순서를 정해(가위바위보 등) 시계 방향으로 진행합니다.</p>
-      <p>자신의 이름이 써있는 카드는 조사할 수 없습니다.</p>
-      <p>획득한 카드는 밀담 중에 공개·교환·양도가 가능하며, 전체 공개는 전체 회의 중에만 가능합니다.</p></div>
+      <details class="read"><summary><b class="tag twarn">마지막 날</b> 교수의 동선과 대사</summary><div class="rt">
+        <div class="frow"><span class="tm">14:00</span><span style="text-align:left;flex:1;margin-left:12px"><b>기지 앞</b> — 탄 시체를 발견하고 시신 보존을 지시. “이건… 사람인가.” “본부에 보고할 의무가 있다. 신원 확인과 사인 조사를 위해, 시신은 보존해 두기로 하지.”</span></div>
+        <div class="frow"><span class="tm">14:00</span><span style="text-align:left;flex:1;margin-left:12px"><b>기지 정문</b> — 전원에게 기지 진입을 지시. “전원, 안으로. 대원들의 안부 확인이 최우선이다. 가능한 한 단독 행동은 피하도록.”</span></div>
+        <div class="frow"><span class="tm">16~18:00</span><span style="text-align:left;flex:1;margin-left:12px"><b>기지 내 (위치 불명)</b> — 각자에게 담당 구역 점검을 지시. 이 시간대 교수 본인의 정확한 위치는 어느 설정서에도 나오지 않음.</span></div>
+        <div class="frow"><span class="tm">19~21:00</span><span style="text-align:left;flex:1;margin-left:12px"><b>식당 → 휴게 공간</b> — 저녁 식사 후 조종사와 단둘이 커피를 마시며 옛이야기(20년 전 첫 비행 등). 문득 진지해지며 탄 시체를 언급 — <span style="color:var(--dim)">▸조종사에게</span> “그 시신 말인데… 어딘가 마음에 걸려. 자네는 그런 적 없나, 답을 알 것 같은데 손이 닿지 않는 기분.”</span></div>
+        <div class="frow"><span class="tm">21:00</span><span style="text-align:left;flex:1;margin-left:12px"><b>교수의 방</b> — 연구자가 찾아와 기술자와의 교제 인정을 요청, 대화가 어긋나 크게 다툼. 부녀의 마지막 대화. <span style="color:var(--dim)">▸연구자에게</span> “지금은 그 이야기를 할 때가 아니야. 대원 18명이 사라진 기지 한복판일세.” <span style="color:var(--dim)">▸연구자의 “그럼 대체 언제인데요!”에</span> — 침묵으로 답함.</span></div>
+        <div class="frow"><span class="tm">22:00</span><span style="text-align:left;flex:1;margin-left:12px"><b>기지 내</b> — 전원에게 취침 지시. “내일은 본격적으로 수색한다. 다들 쉬도록.”</span></div>
+        <div class="frow"><span class="tm">23:30</span><span style="text-align:left;flex:1;margin-left:12px"><b>정문 앞</b> — 방한복에 랜턴을 들고 나옴. 라이터가 얼어붙은 조종사에게 은색 라이터를 건넨다. 교수를 살아 있는 모습으로 본 마지막 순간. “이런 밤중에 폐에 나쁜 짓을 하는군.” “빌려주지. 돌려주는 건 내일이면 되네.” <span style="color:var(--dim)">▸“어딜 가시려고요”에</span> “오두막에. 아무래도 그 시신이 마음에 걸려서 말이야. 한 번 더 봐 두려고.” <span style="color:var(--dim)">▸“같이 가죠”에</span> “됐네, 금방 돌아올 걸세. 자네는 그 한 대나 마저 피우게.”</span></div>
+        <div class="frow"><span class="tm">23:30</span><span style="text-align:left;flex:1;margin-left:12px"><b>오두막으로</b> — 홀로 눈밭을 가로질러 오두막으로. 조종사가 그 등을 지켜봄. 오두막 창에 랜턴 불빛이 한동안 흔들림(조종사가 0:30까지 목격).</span></div>
+        <div class="frow"><span class="tm">00:00 전후</span><span style="text-align:left;flex:1;margin-left:12px"><b>오두막 안</b> — 탄 시체에 잠복해 있던 물체 X가 교수의 머리를 취함. 남은 몸은 감염됨. 교수, 인간으로서 사망. <b style="color:var(--danger)">이후 교수의 대사는 없다. 다음에 교수의 입에서 나오는 말은, 이미 교수가 아니다.</b></span></div>
+      </div></details>
 
-    <div class="box"><h3>카드</h3>
-      <p>카드는 각자의 소지품과 장소 카드 5장으로 이루어져 있습니다. 장소 카드 아래에 있는 카드는 각 장소에 해당하는 시크릿 카드로, 토큰을 이용한 조사로는 획득할 수 없습니다. 시크릿 카드는 해당 장소 카드에 적힌 조건을 충족하면 토큰 소모 없이 획득합니다.</p>
-      <p>감염 수치가 올라가는 카드도 있습니다. 카드 하단에 기록된 수치만큼 자신의 초기 감염 레벨에 더해집니다. 최초 획득 시에만 계산되며, 교환·양도로는 수치가 올라가지 않습니다.</p>
-      <p>사용할 수 있는 아이템 카드도 있습니다. 사용하려면 GM에게 요청하세요. 시간을 잠시 멈추고 아이템 처리를 마친 뒤 다시 진행합니다.</p></div>
+      <details class="read"><summary><b class="tag tred">사후</b> 되살아난 교수가 아는 것</summary><div class="rt">
+        <p>물체 X는 교수의 기억까지 완벽히 복제했으므로, 위의 모든 대화를 ‘교수 본인처럼’ 알고 있습니다. ‘교수의 귀환’에서 이 중 하나를 꺼내면, 그 상대는 ‘죽은 아버지/친우만 알던 일’에 얼어붙습니다.</p>
+        <p><b style="color:var(--scientist,#9d6fd1)">연구자 저격</b> — 21:00의 말다툼: “얘야, 어젯밤엔 아비가 좀 심했다. …그 이야기, 마저 할까?”</p>
+        <p><b style="color:#4faf74">조종사 저격</b> — 23:30의 라이터: “라이터는 잘 썼나, 친구. 돌려받아야 할 텐데.”</p>
+        <div class="gmnote">단, 물체 X는 인공물은 복제하지 못합니다. 교수의 기억·모습·목소리는 완벽하나, 실제 은색 라이터는 조종사의 주머니에 있고 물체 X에게는 없습니다.</div>
+      </div></details>
+    </div>
 
-    <div class="box"><h3>감염 수치에 대해</h3>
-      <p>감염 수치는 정확한 값을 말해서는 안 됩니다. 설정서에 적힌 것처럼 — 괜찮다고 생각되면 <b>“괜찮다”</b>, 위험하다고 생각되면 <b>“조금 나쁘다”</b>, 너무 높아졌다고 생각되면 <b>“매우 나쁘다”</b> 정도로 표현해 주세요.</p>
-      <p>카드에 기록된 수치도 “몇이 올랐다”는 식으로 입 밖에 내지 말아 주세요. 단, 카드의 정보를 보여주면서 수치가 몇인지 확인하게 하는 것은 괜찮습니다.</p></div>
+    <div class="box"><h3>규칙 설명</h3>
+      <p>이 차례에 <b style="color:var(--warn)">초기화면의 ‘규칙 설명’ 메뉴</b>로 들어가, 플레이어들에게 규칙을 읽어줍니다.</p>
+      <button class="btn" data-nav="rules" style="margin-top:4px">규칙 설명 열기 →</button></div>
 
-    <div class="box"><h3>투표에 대해</h3>
-      <p>투표 대상은 감염 수치가 가장 높을 것으로 추정되는 사람입니다. 가장 많은 표를 받은 사람은 별도의 컨테이너에 격리됩니다. <b>최다 득표자가 여러 명이면 모두 함께 격리</b>되므로, 이 점도 토론에서 유의 깊게 이야기해 주시기 바랍니다.</p></div>
+    <div class="box"><h3>아이템 처리</h3>
+      <p>아이템 사용은 <b style="color:var(--frost)">전체 토론 시간에만</b>, 그리고 <b style="color:var(--frost)">두 번째 전체 토론 5분 전까지만</b> 선언할 수 있습니다. 플레이어가 사용을 선언하는 <b style="color:var(--frost)">즉시 영상(시간)을 일시정지</b>한 뒤, 카드 전체 공개와 함께 내용을 읽게 하고, 아이템 사용 조건이 맞는지 확인한 후 처리합니다. <b style="color:var(--frost)">대상 지정은 모두에게 공개되지만, 결과는 사용한 사람에게만 따로 알려줍니다.</b></p>
+
+      <div class="exam"><div class="eh" style="color:var(--frost)">▶ 남겨진 기록</div>
+        <p style="margin:0 0 6px;font-size:12.5px"><b style="color:var(--warn)">조건</b> — 「약품 Y」를 함께 소지하고 있어야 합니다.</p>
+        <p style="margin:0;font-size:13px;line-height:1.7">두 사람을 지정하여, 누구의 감염 레벨 수치가 더 높은지 알려줍니다.</p></div>
+
+      <div class="exam"><div class="eh" style="color:var(--frost)">▶ 감염 치료</div>
+        <p style="margin:0;font-size:13px;line-height:1.7">한 사람을 지정하여 감염 레벨을 −8 낮춥니다. 이미 발병한 자에게는 효과가 없습니다. (현황판의 ‘감염 치료’ 버튼으로 반영)</p></div>
+
+      <div class="exam"><div class="eh" style="color:var(--frost)">▶ 신체검사 키트</div>
+        <p style="margin:0;font-size:13px;line-height:1.7">한 사람을 지정하여, 그 사람의 신체적 특징을 알 수 있습니다. 결과는 아래 ‘신체검사 키트 — 검사 결과’의 해당 인물 항목을 사용자에게만 읽어줍니다.</p></div>
+    </div>
 
     <div class="box"><h3>신체검사 키트 — 검사 결과</h3>
       <div class="callout" style="margin-bottom:12px">GM 전용. 키트 사용자에게만 따로 불러 전달합니다.</div>
@@ -512,19 +571,19 @@ function endingHTML(){
     <!-- ① -->
     <div class="box">
       <div class="stg"><span class="sn">①</span><h3 style="margin:0">클라이맥스 · 투표와 격리</h3></div>
-      <div class="gmnote">지목 결과는 세 갈래입니다. ①한 명 최다 → 격리 후 ‘본부로’. ②2~3명 동수 → 모두 격리 후 ‘본부로’. ③전원 1표씩 → ‘전원 잔류’(자기희생 엔딩, 게임 종료). 전원이 투표를 포기한 경우도 ③으로 처리합니다.<br><b style="color:var(--frost)">격리 판정</b> — 격리되는 자의 <b style="color:var(--frost)">화염방사기는 압수</b>되어 바깥에 남습니다(무기 반입 금지). 열쇠 등 그 밖의 소지 카드는 함께 갇힙니다.</div>
+      <div class="gmnote">지목 결과는 세 갈래입니다. ①한 명 최다 → 격리 후 ‘본부로’. ②2~3명 동수 → 모두 격리 후 ‘본부로’. ③전원 1표씩 → ‘전원 잔류’(자기희생 엔딩, 게임 종료). 전원이 투표를 포기한 경우도 ③으로 처리합니다.<br><b style="color:var(--frost)">격리 판정</b> — 격리되는 자는 <b style="color:var(--frost)">소지한 카드를 모두 잃습니다.</b> 남은 사람들이 합의하여 나눠 가집니다. (열쇠·화염방사기가 컨테이너에 갇히는 일은 없습니다.)</div>
 
-      <details class="read"><summary><b class="tag tcyan">한 명 격리</b> 이후 ‘본부로’ 진행</summary><div class="rt">
+      <details class="read" data-key="vote_one"><summary><b class="tag tcyan">한 명 격리</b> 이후 ‘본부로’ 진행</summary><div class="rt">
         <p>지목이 끝났다. 가장 많은 손가락이 한 사람을 향했고, 그 결정에 따라 그는 격납고로 끌려간다. 그곳에는, 이 기지의 누군가가 오래전 준비해 두었을 견고한 컨테이너가 입을 벌리고 있다. 두꺼운 강철 문이 무겁게 닫히고, 빗장이 채워진다. 안쪽은 완전히 밀폐되어, 빛도 바람도 들지 않는다. 산소가 언제까지 버텨 줄지는 아무도 모른다. 질식하는 것도, 어쩌면 시간문제일 것이다.</p>
         <p>그러나 강철은 소리를 완전히 삼키지는 못한다. 컨테이너 벽을 타고, 갇힌 자의 목소리가 희미하게 새어 나온다. 그는 아직, 이 자리의 대화에 참여할 수 있다. 살아 있는 인간으로서 마지막까지 자신을 변호할 수도 — 혹은, 인간이 아닌 무언가로서, 끝까지 당신들을 흔들어 놓을 수도 있다.</p>
       </div></details>
 
-      <details class="read"><summary><b class="tag twarn">2~3명 동수 격리</b> 이후 ‘본부로’ 진행</summary><div class="rt">
+      <details class="read" data-key="vote_tie"><summary><b class="tag twarn">2~3명 동수 격리</b> 이후 ‘본부로’ 진행</summary><div class="rt">
         <p>지목이 한 사람으로 좁혀지지 않았다. 같은 수의 손가락이 둘, 혹은 셋을 향한 채 팽팽히 맞섰다. 의심은 한 곳에 모이지 못했고, 결국 지목된 자들이 — 둘이든 셋이든 — 모두 격납고로 끌려간다. 강철 컨테이너의 문이 차례로 닫히고, 빗장이 하나씩 채워진다. 누군가는 억울함에 소리치고, 누군가는 체념한 듯 입을 다문다.</p>
         <p>갇힌 자들의 목소리는 여전히 벽을 타고 새어 나온다. 그들은 아직 이 자리의 대화에 낄 수 있다. 그러나 남은 자들의 마음 한구석에는 지워지지 않는 의문이 남는다. 이 안에 정말 ‘그것’이 섞여 있을까. 아니면 — 무고한 동료를, 우리 손으로 산 채로 가둬 버린 것일까.</p>
       </div></details>
 
-      <details class="read"><summary><b class="tag tred">전원 1표씩 — 아무도 못 가림</b> 자기희생 엔딩 · 게임 종료</summary><div class="rt">
+      <details class="read" data-key="vote_none"><summary><b class="tag tred">전원 1표씩 — 아무도 못 가림</b> 자기희생 엔딩 · 게임 종료</summary><div class="rt">
         <p>지목이 끝났을 때, 다섯 사람의 손가락은 제각기 다른 방향을 향하고 있었다. 저마다 한 사람씩을 가리켰지만, 그 끝은 모두 어긋나 있었다. 누구도 누구를 믿지 못했고, 동시에 누구도 한 사람을 확신하지 못했다. 끝내, 격리할 단 한 명조차 가려내지 못한 것이다.</p>
         <p>그리고 당신들은, 말없이 같은 결론에 다다른다. 이 중에 분명 ‘그것’이 있다. 하지만 누구인지 알 수 없다. 그렇다면 — 섣불리 한 사람을 내보냈다가, 그자가 바깥세상으로 감염을 퍼뜨리게 둘 수는 없다. 차라리, 다 같이 여기 남는다. 이 얼어붙은 기지를, 우리 다섯의 무덤으로 삼는다.</p>
         <p>누군가 먼저 헬리콥터의 열쇠를 내려놓는다. 다른 누군가가 조용히 고개를 끄덕인다. 탈출의 가능성은, 스스로의 손으로 닫혔다. 이제 당신들에게 남은 것은 기다림뿐이다. 자신의 손끝이 낯설어지는 감각. 거울 속 얼굴이 미세하게 어긋나는 순간. 옆에서 잠든 동료의 숨소리가, 어느 밤 인간의 것이 아니게 되는 그 소리. 당신들은 한 사람도 빠짐없이, 자신이 천천히 ‘물체 X’가 되어 가는 절망을 끝까지 맛볼 것이다. 그러나 — 적어도 그 절망은, 이 기지 바깥으로는 단 한 걸음도 새어 나가지 않았다. 당신들의 마지막 선택이, 알지 못하는 수많은 사람을 구한 것이다.</p>
@@ -535,21 +594,27 @@ function endingHTML(){
     <!-- ② -->
     <div class="box">
       <div class="stg"><span class="sn">②</span><h3 style="margin:0">본부로 — 한 사람의 귀환</h3></div>
-      <div class="gmnote">‘한 명 격리’ 또는 ‘2~3명 격리’ 이후에만 진행. 단 한 명만 본부행 — 열쇠 소지자가 조종사·기술자 중 한 명을 지명. 열쇠 소지자가 격리돼 있으면 컨테이너를 열어야만 열쇠를 얻을 수 있고, 여는 경우 아래 ‘컨테이너 개봉’을 먼저 낭독.<br><b style="color:var(--frost)">개봉 후 판정</b> — 10 미만(사람)이면 남은 자들이 <b style="color:var(--frost)">석방 또는 재격리</b>를 선택합니다(최종적으로 안에 남은 자가 엔딩 C 대상). 10 이상(괴물)이면 바깥에 압수해 둔 화염방사기로 소각할 수 있고, 소각 후 열쇠 등 금속 소지품은 잿더미에서 회수합니다.<br><b style="color:var(--frost)">조종사·기술자가 모두 격리된 경우</b> — 컨테이너를 열어 10 미만이면 그가 본부행을 맡습니다. 조종 가능한 인간이 하나도 남지 않으면 ①의 ‘전원 잔류(자기희생 엔딩)’를 준용해 종료합니다.</div>
+      <div class="gmnote">‘한 명 격리’ 또는 ‘2~3명 격리’ 이후에만 진행. 단 한 명만 본부행 — 열쇠 소지자가 조종사·기술자 중 한 명을 지명합니다. (격리자의 카드는 몰수·분배되므로 열쇠는 항상 바깥에 있습니다.)<br><b style="color:var(--frost)">컨테이너 개봉은 조종사·기술자가 모두 격리된 경우에만</b> — 개봉하면 <b style="color:var(--frost)">두 사람 모두 풀려납니다.</b> 둘 중 한 명이라도 감염 10 이상이면(현황판 확인) 화염방사기를 쏠 수 있으며, <b style="color:var(--frost)">누구에게 쏠지는 남은 세 명이 결정</b>합니다(겉으로는 구분되지 않음 — 오인 소각 가능). 그 후 살아남은 조종 가능자가 본부로 갑니다. 조종 가능한 인간이 하나도 남지 않으면 ①의 ‘전원 잔류(자기희생 엔딩)’를 준용해 종료합니다.</div>
 
-      <details class="read"><summary><b class="tag tcyan">본부행이 정해졌을 때</b></summary><div class="rt">
+      <details class="read" data-key="open_dual"><summary><b class="tag twarn">컨테이너 개봉 · 두 사람의 귀환</b> 조종사·기술자 동시 격리 시</summary><div class="rt">
+        <p>다른 길은 없었다. 하늘을 아는 두 사람을 모두 가둬 버린 이상, 이 문을 열지 않으면 아무도 이 얼음 밑바닥을 벗어나지 못한다. 빗장이 풀리고, 무거운 강철 문이 신음하며 열린다. 어둠 속에서 두 개의 그림자가 비틀거리며 빛 속으로 걸어 나온다.</p>
+        <p>둘 다 핏기 없이 창백하고, 둘 다 숨이 거칠다. 밀폐된 어둠이 두 사람에게서 똑같이 무언가를 앗아간 것처럼 — 겉으로는, 아무것도 구분할 수 없다. 그러나 남은 세 사람은 알고 있다. 이 중 하나가 이미 사람이 아닐지도 모른다는 것을. 화염방사기의 무게가, 오늘따라 유난히 무겁다.</p>
+        <div class="gmnote">판정 — 두 사람 모두 석방. 둘 중 감염 10 이상자가 있으면(현황판 확인) 화염방사기 사용 가능 — 대상은 남은 세 명이 상의해 결정(오인 소각 가능, 게임 전체 1회). 이후 살아남은 조종 가능자가 본부행.</div>
+      </div></details>
+
+      <details class="read" data-key="depart"><summary><b class="tag tcyan">본부행이 정해졌을 때</b></summary><div class="rt">
         <p>남겨진 자들은 결단했다. 모두가 함께 움직이면 감염은 걷잡을 수 없이 번질 것이다. 그러니 위험을 한 사람에게 몰아주더라도 — 누군가 단 한 명은, 이 지옥을 바깥세상에 알리러 가야 한다.</p>
         <p>격납고의 셔터가 삐걱이며 올라가고, 잠들어 있던 헬리콥터의 로터가 천천히 돌기 시작한다. 얼어붙은 공기가 칼날처럼 갈라진다. 선택된 한 사람이 조종석에 오른다. 남은 이들은 활주로 끝에 서서, 손을 들어 그를 배웅한다. 기체가 떠오르고, 새하얀 설원과 검은 기지가 발아래에서 점점 작아진다. 이윽고 모든 것이 눈보라 속으로 사라지고 — 헬리콥터는, 홀로 회색 하늘을 향해 나아간다.</p>
       </div></details>
 
-      <details class="read"><summary><b class="tag tsafe">컨테이너 개봉 · 감염 10 미만</b></summary><div class="rt">
+      <details class="read" data-key="open_human"><summary><b class="tag tsafe">재회 개봉 · 감염 10 미만</b></summary><div class="rt">
         <p>빗장을 풀고, 무거운 강철 문을 당긴다. 어둠 속에 웅크리고 있던 사람이 빛을 향해 고개를 든다. 오랜 밀폐 탓인지 안색은 핏기 하나 없이 창백하고, 입술은 갈라졌으며, 눈에는 초점이 흐릿하다. 몹시 지쳐 보인다. 그러나 — 분명히, 아직 사람의 모습이다. 그는 천천히 손을 들어 당신들 쪽으로 내민다. 그 손가락은 다섯 개였고, 떨리고 있었으며, 무엇보다 따뜻했다.</p>
-        <div class="gmnote">판정 — 남은 자들이 석방 또는 재격리를 선택합니다. 최종적으로 컨테이너 안에 남은 자가 엔딩 C의 대상이 됩니다.</div>
+        <div class="gmnote">판정 — ⑤재회의 개봉입니다. 아직 사람이므로, 완전 치료제를 먹여 탑승시킬 수 있습니다.</div>
       </div></details>
 
-      <details class="read"><summary><b class="tag tred">컨테이너 개봉 · 감염 10 이상</b></summary><div class="rt">
+      <details class="read" data-key="open_monster"><summary><b class="tag tred">재회 개봉 · 감염 10 이상</b></summary><div class="rt">
         <p>빗장을 푸는 손끝에 불길한 예감이 스친다. 강철 문을 당기는 순간, 안에서 쏟아져 나온 것은 — 이미 사람이 아니었다. 형체를 잃고 뒤틀린 ‘물체 X’의 육체 위에, 낯익은 얼굴 하나가 떼어내다 만 가면처럼 들러붙어 있을 뿐이었다. 그 얼굴이, 당신들을 향해 천천히 미소 짓는다.</p>
-        <div class="gmnote">격리 시 압수되어 바깥에 있는 화염방사기로 즉시 소각할 수 있습니다 — <b style="color:var(--frost)">소각은 게임 전체 1회</b>(가스 소진). 소각 시 — “비명도 없이, 그것은 불길 속에서 검게 오그라들어 재가 된다.” 열쇠 등 금속 소지품은 잿더미에서 회수합니다.</div>
+        <div class="gmnote">화염방사기가 아직 사용되지 않았다면 즉시 소각할 수 있습니다(대상은 괴물, 가스 소진 — 게임 전체 1회). 소각 시 — “비명도 없이, 그것은 불길 속에서 검게 오그라들어 재가 된다.” 소각 수단이 없다면 ④의 ‘10 이상자가 격리도 소각도 안 된 경우’ 낭독으로 즉시 이어져 전원이 포식됩니다.</div>
       </div></details>
     </div>
 
@@ -558,7 +623,12 @@ function endingHTML(){
       <div class="stg"><span class="sn">③</span><h3 style="margin:0">본부 도착 — 본부의 브리핑</h3></div>
       <div class="gmnote">본부행 플레이어와 단둘이 밀담 공간으로 이동. GM이 ‘본부 책임자’가 되어 모니터 너머의 목소리처럼 직접 전달. 감염 레벨 <b style="color:var(--frost)">10 미만</b> → 아래 항목 전달 + ‘완전 치료제’ 카드 4장 지급. <b style="color:var(--frost)">10 이상</b>(발병) → 항목을 전하지 말고 곧바로 ‘파멸’ 단락으로.</div>
 
-      <details class="read"><summary><b class="tag tsafe">감염 10 미만</b> 본부 책임자로서 직접 전달 + 치료제 4장</summary><div class="rt">
+      <details class="read" data-key="arrive"><summary><b class="tag tcyan">도착 장면</b> 브리핑 전 낭독</summary><div class="rt">
+        <p>헬리콥터가 본부의 활주로에 닿는 순간, 방호복을 입은 무리가 소리 없이 기체를 에워싼다. 항의할 틈도 없이 차가운 약품이 온몸에 뿌려지고, 시야가 하얗게 번지며 — 당신은 그대로 의식을 잃는다.</p>
+        <p>눈을 떴을 때, 그곳은 새하얀 격리실이었다. 창도, 문의 손잡이도 보이지 않는다. 이윽고 벽에 걸린 모니터 하나에 불이 들어오고, 화면 너머에서 본부 책임자가 입을 연다.</p>
+      </div></details>
+
+      <details class="read" data-key="brief_ok"><summary><b class="tag tsafe">감염 10 미만</b> 본부 책임자로서 직접 전달 + 치료제 4장</summary><div class="rt">
         <p class="say">기지 안에서 무슨 일이 벌어졌는지는, 우리도 대략 짐작하고 있다.</p>
         <p class="say">안심해라. 당신은 이미 치료를 마쳤다. 현재 당신의 감염 레벨은 0이다.</p>
         <p class="say">하지만 일은 아직 끝나지 않았다. 한 번 더 기지로 돌아가, 가능한 한 많은 대원을 데리고 와 주길 바란다.</p>
@@ -566,9 +636,11 @@ function endingHTML(){
         <p class="say">다만 명심해라. 완전 치료제조차, 이미 발병해 버린 자에게는 듣지 않는다.</p>
         <p class="say">최악의 경우 — 아무도 데려오지 못해도 좋다. 당신 한 사람이라도 무사하면 된다.</p>
         <p class="say">서둘러라. 머지않아 그 기지에는 핵미사일이 떨어질 것이다. 모든 것이 불길에 휩싸여, 흔적도 없이 소독될 것이다.</p>
+        <div class="gmnote">브리핑을 마친 뒤, GM으로서 본인에게 직접 안내합니다.</div>
+        <p class="quote" style="margin-top:8px">“지금 들은 것들 — 완전 치료제의 존재도, 핵미사일이 떨어진다는 사실도 — 기지로 돌아가 다른 사람들에게 말할지, 감출지는 전부 당신의 자유입니다.”</p>
       </div></details>
 
-      <details class="read"><summary><b class="tag tred">감염 10 이상 — 파멸</b> 게임 종료</summary><div class="rt">
+      <details class="read" data-key="brief_doom"><summary><b class="tag tred">감염 10 이상 — 파멸</b> 게임 종료</summary><div class="rt">
         <p>헬리콥터가 본부를 향해 날아가는 동안, 당신은 처음으로 그것을 느꼈다. 피부 아래에서 무언가가 꿈틀거린다. 뼈가 어긋나고, 살이 비틀리고, 익숙했던 몸이 더 이상 자신의 것이 아니게 되어 간다. 그리고 마침내 당신은 자각한다 — 자신은 이미, 한참 전부터 인간이 아니었다는 것을.</p>
         <p>기체가 착륙하고, 마중 나온 본부의 인간들이 다가온다. 그들이 미처 비명을 지르기도 전에, 당신 안의 ‘그것’이 터져 나온다. 본부의 인간들은 남김없이 포식되었다. 그리고 새로운 육체와 새로운 굶주림을 얻은 당신은, 다음 먹잇감을 찾아 본토를 향해 나아간다. 한편, 기지에 남겨진 이들은 끝내 누구의 구조도 받지 못한 채 — 끝없는 추위와 절망 속에서, 한 사람씩, 또 한 사람씩, 천천히 ‘물체 X’가 되어 갔다. 그들의 비명을 들어 줄 사람은, 이제 이 세상 어디에도 없었다.</p>
         <p class="fin">— 이 시점에서 게임은 종료됩니다. —</p>
@@ -578,15 +650,15 @@ function endingHTML(){
     <!-- ④ -->
     <div class="box">
       <div class="stg"><span class="sn">④</span><h3 style="margin:0">기지에 남은 자들 — 남겨진 자들의 의심</h3></div>
-      <div class="gmnote">본부행 플레이어에게는 전달 금지. 컨테이너는 핵폭발에도 견딤. 화염방사기 소지자는 <b style="color:var(--frost)">자신을 제외한</b> 남은 자들 중 한 명을 ‘소각’해 처분 가능 — 상의는 가능하되 30초 이내 결정. <b style="color:var(--frost)">소각은 게임 전체 1회</b> — 컨테이너 개봉 때 이미 사용했다면 불가.</div>
+      <div class="gmnote">본부행 플레이어에게는 전달 금지. 컨테이너는 핵폭발에도 견딤. 화염방사기 소지자는 <b style="color:var(--frost)">자신을 제외한</b> 남은 자들 중 한 명을 ‘소각’해 처분 가능 — 상의는 가능하되 30초 이내 결정. <b style="color:var(--frost)">소각은 게임 전체 1회</b> — 컨테이너 개봉 때 이미 사용했다면 불가. 소각된 자가 감염 10 미만(무고한 인간)이었어도 사망 처리하며, 이후 관전하고 엔딩 낭독에서 제외합니다.<br><b style="color:var(--frost)">판정 시점</b> — 소각 결정(또는 포기) 직후·재회 전, 현황판을 확인해 감염 10 이상자가 격리도 소각도 되지 않았다면 아래 낭독으로 즉시 이어집니다.</div>
 
-      <details class="read"><summary><b class="tag tcyan">남은 자들에게 들려줄 때</b></summary><div class="rt">
-        <p>헬리콥터가 한 사람을 싣고 떠난 뒤, 격납고에는 다시 무거운 침묵이 내려앉는다. 남겨진 넷은 서로의 얼굴을 마주 본다. 정말로, 저 컨테이너 안에 갇힌 자만이 ‘그것’이었을까. 우리는 옳은 자를 가두었을까. 아니면 — 진짜 괴물은, 지금 이 침묵 속에서 함께 숨 쉬고 있는 걸까.</p>
+      <details class="read" data-key="left_talk"><summary><b class="tag tcyan">남은 자들에게 들려줄 때</b></summary><div class="rt">
+        <p>헬리콥터가 한 사람을 싣고 떠난 뒤, 격납고에는 다시 무거운 침묵이 내려앉는다. 남겨진 이들은 서로의 얼굴을 마주 본다. 정말로, 저 컨테이너 안에 갇힌 자만이 ‘그것’이었을까. 우리는 옳은 자를 가두었을까. 아니면 — 진짜 괴물은, 지금 이 침묵 속에서 함께 숨 쉬고 있는 걸까.</p>
         <p>의심은 추위보다 빠르게 번진다. 곁에 선 동료의 숨소리가, 조금 전까지는 아무렇지 않던 그 소리가, 지금은 어딘가 낯설게 들린다. 손에 화염방사기를 쥔 자가 있다면 — 그 무게가 오늘따라 유난히 무겁게 느껴질 것이다. 한 번의 결단이, 동료를 구할 수도, 무고한 인간을 재로 만들 수도 있다.</p>
         <div class="gmnote">소각을 결정했다면 30초 안에 정하게 하고, 그 처분을 묘사합니다.</div>
       </div></details>
 
-      <details class="read"><summary><b class="tag tred">감염 10 이상자가 격리도 소각도 안 된 경우</b></summary><div class="rt">
+      <details class="read" data-key="outbreak"><summary><b class="tag tred">감염 10 이상자가 격리도 소각도 안 된 경우</b></summary><div class="rt">
         <p>마지막 의심이 채 가시기도 전이었다. 그자의 입이, 사람이라면 결코 벌어질 수 없는 각도로 찢어진다. 그 안쪽에서 — 지구상의 온갖 생물을 마구잡이로 뒤섞어 놓은 듯한, 눈을 둘 곳조차 없는 끔찍한 것, ‘물체 X’가 정체를 드러낸다. 저항할 틈도, 비명을 지를 틈도 없었다. 그것은 남은 모두를 한꺼번에 집어삼킨다.</p>
         <p>그리고 잠시 후 — 흩어졌던 살과 뼈가 다시 모여든다. 당신들은 전원, ‘물체 X’로서 하나의 거대한 육체로 재구축된다. 더 이상 ‘나’와 ‘너’의 경계는 없다. 오직 하나의 의지, 하나의 굶주림만이 남는다. 이윽고 구조를 위해 돌아올 헬리콥터에, 한 사람이라도 — 아니, 한 조각이라도 더 많이 올라타기 위해, 당신들은 한마음으로 조용히 때를 기다리기 시작한다.</p>
       </div></details>
@@ -595,9 +667,9 @@ function endingHTML(){
     <!-- ⑤ -->
     <div class="box">
       <div class="stg"><span class="sn">⑤</span><h3 style="margin:0">재회 — 돌아온 헬리콥터</h3></div>
-      <div class="gmnote">전 플레이어 재합류. 본부에서 들은 내용을 어디까지 전할지는 본부행 플레이어의 선택 — 치료제·핵미사일 같은 구체 정보는 GM이 읽지 말고 플레이어끼리 주고받게 하세요. 3분 논의 후, 누구를 데려갈지는 돌아온 플레이어가 최종 결정.<br><b style="color:var(--frost)">이 단계의 컨테이너 개봉 허용</b> — 격리자를 데려가고자 컨테이너를 여는 것도 가능합니다. 그 시점에 ②의 ‘컨테이너 개봉’ 낭독문을 읽으세요. 10 미만이면 완전 치료제를 먹여 탑승시킬 수 있고, 10 이상이면 그 자리에서 괴물이 나타납니다(④의 마지막 단락으로 이어 처리).</div>
+      <div class="gmnote">전 플레이어 재합류. 본부에서 들은 내용을 어디까지 전할지는 본부행 플레이어의 선택 — 치료제·핵미사일 같은 구체 정보는 GM이 읽지 말고 플레이어끼리 주고받게 하세요. 3분 논의 후, 누구를 데려갈지는 돌아온 플레이어가 최종 결정.<br><b style="color:var(--frost)">이 단계의 컨테이너 개봉 — 격리자를 구할 유일한 경로</b> — 격리자를 데려가고자 컨테이너를 여는 것은 이 단계에서만 가능합니다. ‘재회 개봉’ 낭독문을 읽으세요. 10 미만이면 완전 치료제를 먹여 탑승시킬 수 있고, 10 이상이면 괴물이 나타납니다 — 화염방사기가 미사용이면 소각 가능, 없으면 그 자리의 전원이 포식됩니다(④의 마지막 단락으로 이어 처리).</div>
 
-      <details class="read"><summary><b class="tag tcyan">재회 장면</b></summary><div class="rt">
+      <details class="read" data-key="reunion"><summary><b class="tag tcyan">재회 장면</b></summary><div class="rt">
         <p>멀리서, 다시 로터 소리가 들려온다. 처음에는 바람 소리에 묻힐 듯 희미하더니, 이내 또렷해지며 설원 위로 검은 그림자가 내려앉는다. 떠났던 자가, 돌아왔다.</p>
         <p>기체에서 내린 그를, 남겨진 이들이 말없이 바라본다. 그는 무사한 듯 보인다. 그러나 그 표정에서 무엇을 읽어야 할지, 누구도 알 수 없다. 본부에서 무엇을 보고 무슨 말을 들었는지 — 그것을 아는 사람은, 지금 이 자리에 그 한 사람뿐이다. 무엇을 말하고 무엇을 삼킬지는, 오직 그의 입에 달렸다. 짧은 시간이 주어진다. 서로가 가진 조각을 꺼내 맞추든, 감추든, 의심하든. 그리고 마지막에 — 누구를 데리고 이 얼어붙은 땅을 떠날 것인지, 돌아온 자가 결정한다.</p>
       </div></details>
@@ -606,19 +678,25 @@ function endingHTML(){
     <!-- ⑥ -->
     <div class="box">
       <div class="stg"><span class="sn">⑥</span><h3 style="margin:0">최종 엔딩 — 세 갈래의 결말</h3></div>
-      <div class="gmnote">탑승 인원·감염 레벨·컨테이너 잔류 여부로 분기. 여러 조건이 겹치면 해당 단락을 순서대로 읽어 마무리.</div>
+      <div class="gmnote">탑승 인원·감염 레벨·컨테이너 잔류 여부로 분기. 여러 조건이 겹치면 <b style="color:var(--frost)">탑승자의 결말(A 또는 B) → 밖에 남겨진 자들 → 컨테이너(C)</b> 순으로 읽어 마무리합니다.</div>
 
-      <details class="read"><summary><b class="tag tred">엔딩 A</b> 감염 10 이상자가 헬리콥터에 탑승 (파멸)</summary><div class="rt">
+      <details class="read" data-key="endA"><summary><b class="tag tred">엔딩 A</b> 감염 10 이상자가 헬리콥터에 탑승 (파멸)</summary><div class="rt">
         <p>헬리콥터가 무사히 고도를 올리고, 기지가 발아래 멀어진다. 살아남았다는 안도가 기내에 번지려던, 바로 그때였다. 조종사는 뒤에서 누군가 어깨를 톡, 하고 두드리는 것을 느낀다. 별생각 없이 고개를 돌린 그곳에 — 데려가려던 동료의 얼굴은 없었다. 대신, 천장까지 가득 채운 ‘물체 X’의 거대한 몸뚱이가, 수십 개의 눈으로 그를 내려다보고 있었다.</p>
         <p>소리를 지를 틈조차 없었다. 비좁은 기내에서, 도망칠 곳은 어디에도 없었다. 한 사람씩, 차례로 삼켜진다. 그리고 마지막 남은 한 사람마저 사라졌을 때 — 헬리콥터 안에는, 이제 단 하나의 존재만이 남았다. 진정으로 한 몸이 된 그것은, 인간의 기억과 인간의 얼굴을 가면처럼 두른 채, 끝없이 펼쳐진 인간의 세계를 — 그 따뜻하고, 무방비하고, 셀 수 없이 많은 먹잇감의 땅을 — 향해, 조용히 기수를 돌린다. 본토는, 아직 아무것도 모른다.</p>
       </div></details>
 
-      <details class="read"><summary><b class="tag tsafe">엔딩 B</b> 감염 10 이상자가 타지 않음 (생환)</summary><div class="rt">
+      <details class="read" data-key="endB"><summary><b class="tag tsafe">엔딩 B</b> 감염 10 이상자가 타지 않음 (생환)</summary><div class="rt">
         <p>헬리콥터가 본부의 활주로에 내려앉자, 방호복을 입은 무리가 신중하게 당신들을 에워싼다. 차가운 약품이 온몸에 뿌려지고, 한 사람 한 사람 격리되어, 길고 철저한 검사가 시작된다. 며칠이 걸렸는지도 모른다. 그러나 마침내 — 모든 검사를 통과한 당신들에게, 본부는 ‘이상 없음’을 통보한다.</p>
         <p>대가는 침묵이었다. 그곳에서 보고 겪은 모든 것을 결코 발설하지 않는다는 조건으로, 당신들은 한 사람당 30억이라는 거액을 손에 쥐었다. 감시의 눈길은 아마 평생 따라붙을 것이다. 그래도 당신들은 살아남았다. 다시 인간의 거리, 인간의 소음, 인간의 온기 속으로 — 천천히, 그러나 분명히, 돌아간다. 다만 가끔, 추운 밤이면 문득 떠오를 것이다. 그 새하얀 설원과, 강철 컨테이너의 무게와, 끝내 데려오지 못한 누군가의 마지막 표정이. 그것은 평생, 당신들만이 아는 비밀로 남을 것이다.</p>
       </div></details>
 
-      <details class="read"><summary><b class="tag twarn">엔딩 C</b> 컨테이너에 남겨진 자가 있음 (새로운 남극지점 X)</summary><div class="rt">
+      <details class="read" data-key="left_behind"><summary><b class="tag twarn">남겨진 자들</b> 헬리콥터에 타지 못하고 기지에 남은 인간이 있음</summary><div class="rt">
+        <p>마지막 헬리콥터가 떠오른다. 남겨진 이들은 활주로 끝에 선 채, 점이 되어 사라지는 기체를 말없이 바라본다. 소리쳐 부를 수도 있었다. 매달릴 수도 있었다. 그러나 그들은 그러지 않았다 — 혹은, 그럴 수 없었다.</p>
+        <p>기지로 돌아와, 누군가는 식어 버린 커피를 데우고, 누군가는 창밖의 설원을 오래 바라본다. 얼마나 지났을까. 지평선 너머가 문득, 두 번째 태양이 뜬 것처럼 하얗게 타오른다. 소리는 빛보다 늦게 도착했다. 그리고 그다음은 — 아무것도, 도착하지 않았다.</p>
+        <div class="gmnote">남겨진 자 중 감염 10 이상자가 있었다면 이 낭독 대신 ④의 ‘전원 포식’ 상황이 먼저 성립하는지 확인하세요.</div>
+      </div></details>
+
+      <details class="read" data-key="endC"><summary><b class="tag twarn">엔딩 C</b> 컨테이너에 남겨진 자가 있음 (새로운 남극지점 X)</summary><div class="rt">
         <p>…한편 그 무렵, 기지에는 예고된 대로 핵미사일이 떨어졌다. 눈을 멀게 하는 섬광과 함께, 건물도, 시체도, 흔적도, 모든 것이 불길 속에서 소독되어 간다. 가까스로 형체를 유지하던 것들마저 남극의 두꺼운 얼음에 구멍을 뚫고 가라앉아, 이윽고 새하얀 침묵 아래로 전부 파묻혀 간다.</p>
         <p>그러나 — 당신들은, 알고 있을 것이다. 오직 그 컨테이너만은, 핵폭발조차 견뎌내도록 만들어졌다는 것을. 그 안에 갇힌 채 잊혀진 자는, 마지막 숨이 끊어지기 직전에 발병하여, 천천히 ‘물체 X’가 될 것이다. 그리고 — 다시, 잠에 든다. 얼음과 어둠과 강철에 둘러싸인 채로, 영원에 가까운 시간을. 언젠가, 먼 훗날, 누군가가 이 얼어붙은 땅을 다시 찾아와 그 컨테이너를 발견하고, 호기심에 이끌려 그 문을 여는 — 바로 그날까지.</p>
         <p>그렇다. 이곳이, 새로운 ‘남극지점 X’가 되는 것이다.</p>
@@ -631,18 +709,18 @@ function endingHTML(){
       <div class="stg"><span class="sn">◈</span><h3 style="margin:0">사건의 전말 해설</h3></div>
       <div class="gmnote">엔딩 낭독이 끝난 뒤, 비밀 공개와 함께 플레이어들에게 들려주는 해설입니다.</div>
 
-      <details class="read"><summary><b class="tag tcyan">배경</b> 괴멸한 남극 기지에서는 무슨 일이 일어났나?</summary><div class="rt">
+      <details class="read" data-key="reveal_bg"><summary><b class="tag tcyan">배경</b> 괴멸한 남극 기지에서는 무슨 일이 일어났나?</summary><div class="rt">
         <p>포인트 X에는 지구 밖에서 날아온 UFO 같은 것이 묻혀 있었습니다. UFO 조사 중, 근처에 수수께끼의 생명체가 얼음에 갇혀 있는 것을 발견해 이를 가지고 돌아왔습니다. 기지에 있던 연구원들은 화염방사기를 써서 가까스로 태워버렸습니다. 안심한 것도 잠시, 이번에는 동료가 잇따라 X가 되어 갑니다. 그래서 약품 Y를 사용해 감염 위험이 가장 높은 사람부터 순서대로 컨테이너에 격리하고, 발병하면 태우고, 다음 사람을 격리하고… 하는 일을 반복했습니다. 감염 레벨이 가장 높은 사람이 발병할 때까지는 다른 사람은 안전할 거라고 생각한 것입니다.</p>
         <p>그들은 마지막 한 사람이 될 때까지 감염에 관한 연구와 그것을 억제하는 치료제 연구를 진행했습니다. 마지막 남은 한 사람은 가까스로 연구를 완성했지만, 자신이 이미 손쓸 수 없는 상태임을 깨닫습니다. 마침내 자신이 괴물이 되어 버린다는 것을 직감하자, 자기 몸을 태우려 했습니다. 하지만 스스로 자신을 완전히 태워 없애지 못하고, 치료제의 원료가 되는 액체가 든 유리병을 든 채 덜 탄 상태로 기지 앞에 드러눕게 됩니다. (이 유리병을 훗날 연구자가 발견해, 플레이어들의 손으로 치료제가 완성됩니다.) 그곳에 당신들이 나타나, 새로운 희생자가 된 것입니다.</p>
       </div></details>
 
-      <details class="read"><summary><b class="tag tred">본부의 속셈</b></summary><div class="rt">
+      <details class="read" data-key="reveal_hq"><summary><b class="tag tred">본부의 속셈</b></summary><div class="rt">
         <p>본부는 X의 존재를 이전부터 인지하고 있었고, 더욱이 위성사진으로 기지에 그것이 있으리라는 것도 알고 있었습니다. 완전 치료제도 미리 준비된 것으로, 기지에서 돌아온 인물에 대한 처리가 능숙했던 것도 그 때문입니다. X의 군사적 이용을 노리고 있으며, 연구를 위해 적당히 감염된 인간 샘플을 얻고자 당신들을 일부러 보낸 것입니다. 하지만 돌아온 것이 한 명뿐이었기에, 더 많은 샘플을 손에 넣으려고 한 번 더 돌아갈 것을 제안한 것입니다.</p>
       </div></details>
     </div>
 
     <!-- 마무리 -->
-    <div class="box">
+    <div class="box" data-key="closing">
       <div class="stg"><span class="sn">✦</span><h3 style="margin:0">낭독을 마치며</h3></div>
       <div class="rt" style="margin-top:4px">
         <p>이야기는 끝났습니다. 이제 비밀 공개의 시간입니다. 각 플레이어에게 자신의 목표를 이뤘는지 차례로 발표하게 하고, 어떻게 하면 ‘물체 X’의 정체에 다다를 수 있었는지 — 그 추리의 길을 함께 천천히 되짚어 주세요. 누가 이기고 누가 졌든, 이 두 시간 동안 다섯 사람이 함께 엮어낸 이야기는 오직 이 자리에만 존재하는 단 하나의 결말입니다. 승자에게는 납득을, 패자에게는 꽃을. 그것이 이 차갑고 긴 이야기를 닫는, 가장 따뜻한 방법입니다.</p>
@@ -651,6 +729,7 @@ function endingHTML(){
   </div>`;
   return stages;
 }
+
 
 // ── 현황판 ──
 const FACE = {
@@ -667,8 +746,8 @@ function cardHTML(c){
   const cls = "card" + (inf ? " inf" : (c.invs.length ? " assigned" : ""));
   const badge = inf ? `<span class="badge">+${c.val}</span>` : "";
   const f = c.group === "char" ? FACE[c.owner] : FACE[c.group];
-  const big = c.group === "char" ? roleById[c.owner].name : c.name;
-  const sub = c.group === "char" ? esc(c.name) : (c.group === "secret" && c.sub ? esc(c.name) : "");
+  const big = c.group === "char" ? roleById[c.owner].name : (c.group === "secret" ? c.sub : c.name);
+  const sub = c.group === "char" || c.group === "secret" ? esc(c.name) : "";
   const no  = c.group === "char" ? `<span class="fno">${c.slot}</span>` : "";
   const chips = ROLES.map(r => {
     const on = c.invs.includes(r.id), own = c.owner === r.id;
@@ -768,6 +847,7 @@ function render(){
   if(state.screen === "home"){ app.innerHTML = homeHTML(); return; }
   if(state.screen === "prologue"){ app.innerHTML = topbar("프롤로그") + prologueHTML(); return; }
   if(state.screen === "guide"){ app.innerHTML = topbar("GM 가이드") + guideHTML(); return; }
+  if(state.screen === "rules"){ app.innerHTML = topbar("규칙 설명") + rulesHTML(); return; }
   if(state.screen === "ending"){ app.innerHTML = topbar("엔딩") + endingHTML(); return; }
   const tools = `<span id="saved" class="saved">자동 저장</span><button class="btn" id="reset">${IC.reset} 초기화</button>`;
   app.innerHTML = topbar("현황판", tools) + consoleHTML();
