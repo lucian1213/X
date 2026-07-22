@@ -315,7 +315,10 @@ function totals(){
   });
 }
 const meetingsThisPhase = () => state.meetings.filter(m => m.phase === state.phase).length;
-const lastTarget = () => state.meetings.length ? state.meetings[state.meetings.length-1].target : null;
+const lastTarget = () => {
+  const ph = state.meetings.filter(m => m.phase === state.phase);
+  return ph.length ? ph[ph.length-1].target : null;   // 연속 금지는 같은 조사 시간 안에서만
+};
 function canMeet(tid){
   if(state.meetings.length >= 10) return { ok:false, why:"전체 10회 상한" };
   if(meetingsThisPhase() >= 5) return { ok:false, why:"이번 조사 5회 상한" };
@@ -825,7 +828,7 @@ function renderAside(){
     <div><div class="phead">${IC.monitor}<h2>수치 현황</h2></div>
       <div style="display:grid;gap:8px">${gauges}</div></div>
     <div class="box"><div class="phead inline">${IC.syr}<h2>의사 밀담</h2></div>
-      <div class="note" style="margin:2px 0 11px">단둘이 밀담 → 대상 +1 · 조사당 5 · 전체 10 · 연속 금지</div>
+      <div class="note" style="margin:2px 0 11px">단둘이 밀담 → 대상 +1 · 조사당 5 · 전체 10 · 연속 금지(같은 조사 안에서만 — 조사가 바뀌면 같은 상대 재선택 가능)</div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
         <div class="segrow"><span style="font-size:11px;color:var(--dim)">조사</span>${segs}</div>
         <div class="counts"><b class="${mp>=5?"hot":""}">${mp}/5</b>
